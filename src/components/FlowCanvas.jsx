@@ -2,11 +2,7 @@ import React, { useCallback, useState } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
-  Background,
-  useNodes,
-  useEdges,
   addEdge,
-  isNode,
   useNodesState,
   useEdgesState,
 } from "reactflow";
@@ -14,18 +10,25 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import SettingsPanel from "./SettingsPanel";
 import NodesPanel from "./NodePanel";
+import TopBar from "./TopBar";
 
 const initialNodes = [
-  { id: "1", type: "textNode", position: { x: 0, y: 0 }, data: { label: "1" } },
+  { id: "1", type: "default", position: { x: 0, y: 0 }, data: { label: "1" } },
   {
     id: "2",
-    type: "textNode",
+    type: "default",
     position: { x: 0, y: 100 },
     data: { label: "2" },
   },
 ];
 
-const initialEdges = [{ id: "e1-2", source: "1", target: "2" }];
+const initialEdges = [
+  {
+    id: "e1-2",
+    source: "1",
+    target: "2",
+  },
+];
 
 const FlowCanvas = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -54,21 +57,18 @@ const FlowCanvas = () => {
   };
 
   const onSave = () => {
-    if (nodes.length < 2) {
-      alert("Error: Only one node present. Add more nodes.");
-      return;
-    }
+    const nodeIds = nodes.map((node) => node.id);
+    const sourceIds = edges.map((edge) => edge.source);
+    const targetIds = edges.map((edge) => edge.target);
 
-    const emptyTargetHandles = nodes.filter(
-      (node) =>
-        (!selectedNode || node.id !== selectedNode.id) &&
-        (!node.target || node.target.length === 0)
+    const allNodesConnected = nodeIds.every(
+      (nodeId) => sourceIds.includes(nodeId) || targetIds.includes(nodeId)
     );
 
-    if (emptyTargetHandles.length > 0) {
-      alert("Error: Some nodes have empty target handles.");
+    if (allNodesConnected) {
+      alert("Congrats! The flow is valid.");
     } else {
-      alert("Flow saved successfully!");
+      alert("Please connect all nodes. Cannot save the flow.");
     }
   };
 
@@ -111,14 +111,7 @@ const FlowCanvas = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="bg-gray-200 px-8 py-2 mb-2">
-        <button
-          onClick={onSave}
-          className="bg-white border-blue-600 border text-blue-600 py-1 px-4 rounded-md"
-        >
-          Save Changes
-        </button>
-      </div>
+      <TopBar onSave={onSave} />
       <div className="flex w-full">
         <div style={{ width: "80vw", height: "93vh" }}>
           <ReactFlow

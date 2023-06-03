@@ -8,7 +8,7 @@ const NodesPanel = () => {
   };
 
   const nodeTypes = [
-    { type: "textNode", label: "Message" },
+    { type: "default", label: "Message" },
     // { type: "textNode", label: "Text Node" },
     // Add more node types here
     // { type: "messageNode", label: "Message Node" },
